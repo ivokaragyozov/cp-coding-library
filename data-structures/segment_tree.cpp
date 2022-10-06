@@ -9,7 +9,7 @@ struct SegmentTree {
 		treeSize = _treeSize;
 	}
 
-	void push_lazy(int32_t node, int32_t low, int32_t high) {
+	void pushLazy(int32_t node, int32_t low, int32_t high) {
 		data[node] += (high - low + 1) * lazy[node];
 
 		if(low != high) {
@@ -21,14 +21,14 @@ struct SegmentTree {
 	}
 
 	void update(int32_t node, int32_t low, int32_t high, int32_t qLow, int32_t qHigh, T qVal) {
-		push_lazy(node, low, high);
+		pushLazy(node, low, high);
 		
 		if(low > qHigh || high < qLow) {
 			return;
 		}
 		if(low >= qLow && high <= qHigh) {
 			lazy[node] += qVal;
-			push_lazy(node, low, high);
+			pushLazy(node, low, high);
 			return;
 		}
 
@@ -44,7 +44,7 @@ struct SegmentTree {
 	}
 
 	T query(int32_t node, int32_t low, int32_t high, int32_t qLow, int32_t qHigh) {
-		push_lazy(node, low, high);
+		pushLazy(node, low, high);
 
 		if(low > qHigh || high < qLow) {
 			return 0;
