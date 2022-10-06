@@ -8,11 +8,11 @@ struct SuffixArray {
 		suffArr.resize(t.size());
 		lcpArr.resize(t.size());
 
-		build_suff_array();
-		build_lcp_array();
+		buildSuffArray();
+		buildLcpArray();
 	}
 
-	void radix_sort(std::vector< std::pair< std::pair< int32_t, int32_t >, int32_t > > &v) {
+	void radixSort(std::vector< std::pair< std::pair< int32_t, int32_t >, int32_t > > &v) {
 		int32_t n = v.size();
 		
 		{
@@ -56,7 +56,7 @@ struct SuffixArray {
 		}
 	}
 
-	void build_suff_array() {
+	void buildSuffArray() {
 		int32_t n = t.size();
 
 		std::vector< std::pair< char, int32_t > > a(n);
@@ -83,7 +83,7 @@ struct SuffixArray {
 				v[i] = {{ ranks[i], ranks[(i + (1 << k)) % n] }, i};	
 			}
 			
-			radix_sort(v);
+			radixSort(v);
 			
 			for(int32_t i = 0; i < n; i++) {
 				suffArr[i] = v[i].second;
@@ -131,7 +131,7 @@ struct SuffixArray {
 		return false;
 	}
 	
-	int32_t count_occurances(const std::string &p) {
+	int32_t countOccurances(const std::string &p) {
 		int32_t n = t.size();
 		int32_t m = p.size();
 		
@@ -193,7 +193,7 @@ struct SuffixArray {
 		return h - l + 1;
 	}
 
-	void build_lcp_array() {
+	void buildLcpArray() {
 		int32_t n = t.size();
 
 		std::vector< int32_t > revSuff(n);
@@ -215,7 +215,7 @@ struct SuffixArray {
 		}
 	}
 
-	int64_t count_different_substrings() {
+	int64_t countDifferentSubstrings() {
 		int32_t n = t.size();
 	
 		int64_t ans = 0;
