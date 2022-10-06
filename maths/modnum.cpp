@@ -21,22 +21,22 @@ template< int32_t _MOD > struct ModNum {
 		return i;
 	}
 
-	friend ModNum fast_pow(const ModNum &x, int32_t pw) {
+	friend ModNum fastPow(const ModNum &x, int32_t pw) {
 		if(pw == 0) {
 			return ModNum(1);
 		}
 		else if(pw % 2 == 0) {
-			ModNum aux = fast_pow(x, pw / 2);
+			ModNum aux = fastPow(x, pw / 2);
 			return aux * aux;
 		}
 		else {
-			ModNum aux = fast_pow(x, pw - 1);
+			ModNum aux = fastPow(x, pw - 1);
 			return aux * x;
 		}
 	}
 
 	ModNum inv() const {
-		return fast_pow(*this, MOD - 2);
+		return fastPow(*this, MOD - 2);
 	}
 
 	ModNum& operator++ () {
