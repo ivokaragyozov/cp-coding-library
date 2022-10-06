@@ -45,7 +45,7 @@ struct Hash {
 		}
 	}
 	
-	bool is_palindrome() {
+	bool isPalindrome() {
 		for(int32_t p = 0; p < CNT; p++) {
 			if(h[p] != rev[p]) {
 				return false;
