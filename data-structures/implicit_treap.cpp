@@ -19,11 +19,11 @@ struct ImplicitTreap {
 			r = nullptr;
 		}
 
-		static int32_t get_subtree(Node *x) {
+		static int32_t getSubtree(Node *x) {
 			return (x != nullptr ? x->subtree : 0);
 		}
 		
-		static T get_val(Node *x) {
+		static T getVal(Node *x) {
 			if(x == nullptr) {
 				return T();
 			}
@@ -31,7 +31,7 @@ struct ImplicitTreap {
 			return x->val;
 		}
 
-		static T get_total(Node *x) {
+		static T getTotal(Node *x) {
 			if(x == nullptr) {
 				return T();
 			}
@@ -65,11 +65,11 @@ struct ImplicitTreap {
 			push(x->l);
 			push(x->r);
 
-			x->subtree = get_subtree(x->l) + 1 + get_subtree(x->r);
-			x->total = get_total(x->l) + x->val + get_total(x->r);
+			x->subtree = getSubtree(x->l) + 1 + getSubtree(x->r);
+			x->total = getTotal(x->l) + x->val + getTotal(x->r);
 		}
 	
-		static void update_parent(Node *x) {
+		static void updateParent(Node *x) {
 			if(x == nullptr) {
 				return;
 			}
@@ -89,7 +89,7 @@ struct ImplicitTreap {
 
 			push(t);
 
-			int32_t curr = add + Node::get_subtree(t->l) + 1;
+			int32_t curr = add + Node::getSubtree(t->l) + 1;
 			if(curr <= key) {
 				auto aux = split(t->r, key, curr);
 				
@@ -98,7 +98,7 @@ struct ImplicitTreap {
 				}
 
 				t->r = aux.first;
-				update_parent(t);
+				updateParent(t);
 				pull(t);
 				return { t, aux.second };
 			}
@@ -110,7 +110,7 @@ struct ImplicitTreap {
 				}
 
 				t->l = aux.second;
-				update_parent(t);
+				updateParent(t);
 				pull(t);
 				return { aux.first, t };
 			}
@@ -133,7 +133,7 @@ struct ImplicitTreap {
 				}
 
 				sm->r = merge(sm->r, bg);
-				update_parent(sm);
+				updateParent(sm);
 				pull(sm);
 				return sm;
 			}
@@ -143,7 +143,7 @@ struct ImplicitTreap {
 				}
 
 				bg->l = merge(sm, bg->l);
-				update_parent(bg);
+				updateParent(bg);
 				pull(bg);
 				return bg;
 			}
@@ -153,18 +153,18 @@ struct ImplicitTreap {
 	int32_t nxtNode;
 	Node nodes[MAX_N + 5], *root;
 
-	Node* get_node(T val) {
+	Node* getNode(T val) {
 		nodes[nxtNode] = Node(val);
 		return &nodes[nxtNode++];
 	}
 
-	void insert_at_ind(int32_t ind, Node *t) {
+	void insertAtInd(int32_t ind, Node *t) {
 		auto aux = Node::split(root, ind - 1);
 		aux.first = Node::merge(aux.first, t);
 		root = Node::merge(aux.first, aux.second);
 	}
 	
-	std::vector< Node* > split_interval(int32_t low, int32_t high) {
+	std::vector< Node* > splitInterval(int32_t low, int32_t high) {
 		auto aux1 = Node::split(root, low - 1);
 		auto aux2 = Node::split(aux1.second, high - low + 1);
 
@@ -172,33 +172,33 @@ struct ImplicitTreap {
 		return ans;
 	}
 
-	void merge_intervals(const std::vector< Node* > &v) {
+	void mergeIntervals(const std::vector< Node* > &v) {
 		root = nullptr;
 		for(auto &t : v) {
 			root = Node::merge(root, t);
 		}
 	}
 
-	void reverse_interval(int32_t low, int32_t high) {
-		auto aux = split_interval(low, high);
+	void reverseInterval(int32_t low, int32_t high) {
+		auto aux = splitInterval(low, high);
 		if(aux[1] != nullptr) {
 			aux[1]->rev = true;
 		}
-		merge_intervals(aux);
+		mergeIntervals(aux);
 	}
 
-	void print_treap(Node *t) {
+	void printTreap(Node *t) {
 		if(t == nullptr) {
 			return;
 		}
 
-		print_treap(t->l);
+		printTreap(t->l);
 		std::cout << t->val << " ";
-		print_treap(t->r);
+		printTreap(t->r);
 	}
 
 	void print() {
-		print_treap(root);
+		printTreap(root);
 		std::cout << '\n';
 	}
 };
