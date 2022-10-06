@@ -19,7 +19,7 @@ struct MaxFlow {
 		n = _n;
 	}
 
-	void add_edge(int32_t u, int32_t v, int32_t cap) {
+	void addEdge(int32_t u, int32_t v, int32_t cap) {
 		edges.push_back(Edge(v, cap));
 		g[u].push_back(edges.size() - 1);
 
@@ -78,7 +78,7 @@ struct MaxFlow {
 		return 0;
 	}
 
-	T calc_max_flow(int32_t source, int32_t sink) {
+	T calcMaxFlow(int32_t source, int32_t sink) {
 		T flow = 0;
 		while(1) {
 			bfs(source, sink);
