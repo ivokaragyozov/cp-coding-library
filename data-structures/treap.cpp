@@ -26,7 +26,7 @@ struct Treap {
 		root = nullptr;
 	}
 	
-	int32_t get_size(Node *t) {
+	int32_t getSize(Node *t) {
 		return (t == nullptr ? 0 : t->subsize);
 	}
 
@@ -35,7 +35,7 @@ struct Treap {
 			return;
 		}
 
-		t->subsize = get_size(t->l) + 1 + get_size(t->r);
+		t->subsize = getSize(t->l) + 1 + getSize(t->r);
 	}
 
 	std::pair< Node*, Node* > split(Node *t, T key) {
@@ -81,7 +81,7 @@ struct Treap {
 		}
 	}
 
-	void insert_val(T x) {
+	void insertVal(T x) {
 		nodes[nxtNode] = Node(x);
 
 		auto aux1 = split(root, x);
@@ -91,13 +91,13 @@ struct Treap {
 		nxtNode++;
 	}
 
-	void delete_all(T x) {	
+	void deleteAll(T x) {	
 		auto aux1 = split(root, x);
 		auto aux2 = split(aux1.first, x - 1);
 		root = merge(aux2.first, aux1.second);
 	}
 
-	void delete_single(T x) {
+	void deleteSingle(T x) {
 		auto aux1 = split(root, x);
 		auto aux2 = split(aux1.first, x - 1);
 
@@ -106,24 +106,24 @@ struct Treap {
 		root = merge(aux1.first, aux1.second);	
 	}
 	
-	Node* find_kth(Node *t, int32_t k) {
+	Node* findKth(Node *t, int32_t k) {
 		if(t == nullptr) {
 			return nullptr;
 		}
 
-		if(get_size(t->l) == k - 1) {
+		if(getSize(t->l) == k - 1) {
 			return t;
 		}
-		else if(get_size(t->l) < k - 1) {
-			return find_kth(t->r, k - get_size(t->l) - 1);
+		else if(getSize(t->l) < k - 1) {
+			return findKth(t->r, k - getSize(t->l) - 1);
 		}
 		else {
-			return find_kth(t->l, k);
+			return findKth(t->l, k);
 		}
 	}
 
-	T find_kth(int32_t k) {
-		auto aux = find_kth(root, k);
+	T findKth(int32_t k) {
+		auto aux = findKth(root, k);
 
 		if(aux == nullptr) {
 			return -1;
@@ -132,25 +132,25 @@ struct Treap {
 		return aux->key;
 	}
 	
-	int32_t find_order(T x) {
+	int32_t findOrder(T x) {
 		auto aux = split(root, x - 1);
-		int32_t ans = get_size(aux.first);
+		int32_t ans = getSize(aux.first);
 		root = merge(aux.first, aux.second);
 		return ans;
 	}
 	
-	void print_treap(Node *t) {
+	void printTreap(Node *t) {
 		if(t == nullptr) {
 			return;
 		}
 
-		print_treap(t->l);
+		printTreap(t->l);
 		std::cout << t->key << " ";
-		print_treap(t->r);
+		printTreap(t->r);
 	}
 
 	void print() {
-		print_treap(root);
+		printTreap(root);
 		std::cout << '\n';
 	}
 };
