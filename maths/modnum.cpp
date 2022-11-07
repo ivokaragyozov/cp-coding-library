@@ -1,11 +1,14 @@
 template< int32_t _MOD > struct ModNum {
 	static const int32_t MOD = _MOD;
-
+ 
 	int32_t v;
-
+ 
 	ModNum() : v(0) {}
-	ModNum(int64_t _v) : v(_v % MOD) {}
-
+	ModNum(int64_t _v) {
+		if(_v < 0) _v += MOD;
+		v = _v % MOD;
+	}
+ 
 	operator int32_t() const {
 		return v;
 	}
@@ -16,11 +19,11 @@ template< int32_t _MOD > struct ModNum {
 	friend std::istream& operator>> (std::istream &i, ModNum &x) {
 		int64_t val;
 		i >> val;
-
+ 
 		x = ModNum(val);
 		return i;
 	}
-
+ 
 	friend ModNum fastPow(const ModNum &x, int32_t pw) {
 		if(pw == 0) {
 			return ModNum(1);
@@ -34,11 +37,11 @@ template< int32_t _MOD > struct ModNum {
 			return aux * x;
 		}
 	}
-
+ 
 	ModNum inv() const {
 		return fastPow(*this, MOD - 2);
 	}
-
+ 
 	ModNum& operator++ () {
 		v++;
 		if(v == MOD) {
@@ -63,7 +66,7 @@ template< int32_t _MOD > struct ModNum {
 		*this--;
 		return aux;
 	}
-
+ 
 	ModNum& operator+= (const ModNum &o) {
 		v += o.v;
 		if(v >= MOD) {
@@ -76,16 +79,19 @@ template< int32_t _MOD > struct ModNum {
 		if(v < 0) {
 			v += MOD;
 		}
+		if(v >= MOD) {
+			v -= MOD;
+		}
 		return *this;
 	}
 	ModNum& operator*= (const ModNum &o) {
-		v = (int64_t) v * o.v % MOD;
+		v = ((int64_t) v * o.v) % MOD;
 		return *this;
 	}
 	ModNum& operator/= (const ModNum &o) {
 		return *this *= o.inv();
 	}
-
+ 
 	friend ModNum operator+ (const ModNum &a, const ModNum &b) {
 		return ModNum(a) += b;
 	}
@@ -98,7 +104,7 @@ template< int32_t _MOD > struct ModNum {
 	friend ModNum operator/ (const ModNum &a, const ModNum &b) {
 		return ModNum(a) /= b;
 	}
-
+ 
 	friend ModNum operator+ (const ModNum &a, int32_t b) {
 		return a + ModNum(b);
 	}
@@ -112,4 +118,3 @@ template< int32_t _MOD > struct ModNum {
 		return a / ModNum(b);
 	}
 };
-
