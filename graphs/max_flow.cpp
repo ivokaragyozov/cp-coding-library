@@ -1,4 +1,3 @@
-const int32_t MAX_N = 5000;
 const int32_t INF = 1e9 + 5;
 
 template<typename T>
@@ -11,15 +10,16 @@ struct MaxFlow {
 		Edge(int32_t _v, T _cap) : v(_v), cap(_cap) {}
 	};
 
-	int32_t n, dep[MAX_N + 5], ind[MAX_N + 5];
-	std::vector< int32_t > g[MAX_N + 5];
-	std::vector< Edge > edges;
+	int32_t n;
+	std::vector<int32_t> dep, ind;
+	std::vector<std::vector<int32_t>> g;
+	std::vector<Edge> edges;
 
-	void init(int32_t _n) {
-		n = _n;
-	}
+	MaxFlow(int32_t n): n(n), dep(n), ind(n, 0), g(n) {}
 
-	void addEdge(int32_t u, int32_t v, int32_t cap) {
+	void addEdge(int32_t u, int32_t v, T cap) {
+		if(cap == 0) return;
+
 		edges.push_back(Edge(v, cap));
 		g[u].push_back(edges.size() - 1);
 
@@ -28,9 +28,9 @@ struct MaxFlow {
 	}
 
 	void bfs(int32_t source, int32_t sink) {
-		std::queue< int32_t > q;
+		std::queue<int32_t> q;
 		
-		for(int32_t i = 1; i <= n; i++) {
+		for(int32_t i = 0; i < n; i++) {
 			dep[i] = -1;
 		}
 		dep[sink] = 0;
@@ -46,7 +46,7 @@ struct MaxFlow {
 				break;
 			}
 
-			for(auto &e : g[u]) {
+			for(auto e : g[u]) {
 				if(edges[e ^ 1].cap != 0 && dep[edges[e].v] == -1) {
 					q.push(edges[e].v);
 					dep[edges[e].v] = d + 1;
@@ -78,7 +78,7 @@ struct MaxFlow {
 		return 0;
 	}
 
-	T calcMaxFlow(int32_t source, int32_t sink) {
+	T getMaxFlow(int32_t source, int32_t sink) {
 		T flow = 0;
 		while(1) {
 			bfs(source, sink);
@@ -87,9 +87,7 @@ struct MaxFlow {
 				break;
 			}
 			
-			for(int32_t i = 1; i <= n; i++) {
-				ind[i] = 0;
-			}
+			std::fill(ind.begin(), ind.end(), 0);
 			while(1) {
 				T f = dfs(source, INF);
 				if(f == 0) {
@@ -103,3 +101,4 @@ struct MaxFlow {
 		return flow;
 	}
 };
+
