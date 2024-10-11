@@ -1,16 +1,16 @@
-template <int MOD> struct ModNum {
+template <int MOD> class ModNum {
+  private:
     int v;
 
+  public:
     ModNum() : v(0) {}
     ModNum(int _v) : v(_v % MOD) {}
     ModNum(int64_t _v) : v(_v % MOD) {}
 
     operator int() const { return v; }
 
-    friend std::ostream &operator<<(std::ostream &o, ModNum &x) {
-        return o << (int)x;
-    }
-    friend std::istream &operator>>(std::istream &i, ModNum &x) {
+    friend ostream &operator<<(ostream &o, ModNum &x) { return o << (int)x; }
+    friend istream &operator>>(istream &i, ModNum &x) {
         int64_t val;
         i >> val;
 
