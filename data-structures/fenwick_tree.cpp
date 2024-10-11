@@ -1,7 +1,9 @@
-template <typename T> struct FenwickTree {
+template <typename T> class FenwickTree {
+  private:
     int treeSize;
     vector<T> data;
 
+  public:
     FenwickTree(int _size) : treeSize(_size), data(_size + 1, 0) {}
 
     void update(int ind, T val) {
