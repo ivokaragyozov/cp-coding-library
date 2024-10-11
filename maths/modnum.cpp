@@ -1,7 +1,3 @@
-#include <cstdint>
-#include <istream>
-#include <ostream>
-
 template <int MOD> struct ModNum {
     int v;
 
