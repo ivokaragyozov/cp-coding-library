@@ -22,5 +22,5 @@ template <typename T> class FenwickTree {
         return ans;
     }
 
-    T getInterval(int low, int high) { return get(high) - get(low - 1); }
+    T get_interval(int low, int high) { return get(high) - get(low - 1); }
 };

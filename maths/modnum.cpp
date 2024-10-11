@@ -18,7 +18,7 @@ template <int MOD> class ModNum {
         return i;
     }
 
-    friend ModNum fastPow(const ModNum &x, int pw) {
+    friend ModNum fast_pow(const ModNum &x, int pw) {
         if (pw == 0) {
             return ModNum(1);
         } else if (pw % 2 == 0) {
@@ -30,7 +30,7 @@ template <int MOD> class ModNum {
         }
     }
 
-    ModNum inv() const { return fastPow(*this, MOD - 2); }
+    ModNum inv() const { return fast_pow(*this, MOD - 2); }
 
     ModNum &operator++() {
         v++;
