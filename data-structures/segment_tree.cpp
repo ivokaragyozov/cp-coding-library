@@ -3,10 +3,6 @@ template <typename T> class SegmentTree {
     int treeSize;
     vector<T> data, lazy;
 
-  public:
-    SegmentTree(int _size)
-        : treeSize(_size), data(4 * _size), lazy(4 * _size) {}
-
     void push_lazy(int node, int low, int high) {
         data[node] += (high - low + 1) * lazy[node];
 
@@ -37,10 +33,6 @@ template <typename T> class SegmentTree {
         data[node] = data[(node << 1)] + data[(node << 1) + 1];
     }
 
-    void update(int low, int high, T val) {
-        update(1, 1, treeSize, low, high, val);
-    }
-
     T query(int node, int low, int high, int qLow, int qHigh) {
         push_lazy(node, low, high);
 
@@ -54,6 +46,14 @@ template <typename T> class SegmentTree {
         int mid = ((low + high) >> 1);
         return query((node << 1), low, mid, qLow, qHigh) +
                query((node << 1) + 1, mid + 1, high, qLow, qHigh);
+    }
+
+  public:
+    SegmentTree(int _size)
+        : treeSize(_size), data(4 * _size), lazy(4 * _size) {}
+
+    void update(int low, int high, T val) {
+        update(1, 1, treeSize, low, high, val);
     }
 
     T query(int low, int high) { return query(1, 1, treeSize, low, high); }
