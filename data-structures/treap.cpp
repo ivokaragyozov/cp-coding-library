@@ -1,157 +1,151 @@
-const int32_t MAX_N = 2e5;
-std::mt19937 mt(69);
+const int MAX_N = 2e5;
+mt19937 mt(69);
 
-template< typename T >
-struct Treap {
-	struct Node {
-		T key;
-		int32_t prior, subsize;
-		Node *l, *r;	
-		
-		Node() {}
-		Node(T _key) : key(_key) {
-			prior = mt();
-			subsize = 1;
+template <typename T> class Treap {
+  private:
+    struct node;
+    using pnode = node *;
 
-			l = nullptr;
-			r = nullptr;
-		}
-	};
-	
-	int32_t nxtNode;
-	Node *root, nodes[MAX_N + 5];
+    struct node {
+        T key;
+        int prior, subsize;
+        pnode l, r;
 
-	Treap() {
-		nxtNode = 0;
-		root = nullptr;
-	}
-	
-	int32_t getSize(Node *t) {
-		return (t == nullptr ? 0 : t->subsize);
-	}
+        node() {}
+        node(T _key) : key(_key) {
+            prior = mt();
+            subsize = 1;
 
-	void pull(Node *t) {
-		if(t == nullptr) {
-			return;
-		}
+            l = nullptr;
+            r = nullptr;
+        }
+    };
 
-		t->subsize = getSize(t->l) + 1 + getSize(t->r);
-	}
+    int nxtNode = 0;
+    pnode root = nullptr;
+    node nodes[MAX_N + 5];
 
-	std::pair< Node*, Node* > split(Node *t, T key) {
-		if(t == nullptr) {
-			return { nullptr, nullptr };
-		}
+    int get_size(pnode t) const { return (t == nullptr ? 0 : t->subsize); }
 
-		if(t->key <= key) {
-			auto aux = split(t->r, key);
-			t->r = aux.first;
-			
-			pull(t);
+    void pull(pnode t) {
+        if (t == nullptr) {
+            return;
+        }
 
-			return { t, aux.second };
-		}
-		else {
-			auto aux = split(t->l, key);
-			t->l = aux.second;
-			
-			pull(t);
+        t->subsize = get_size(t->l) + 1 + get_size(t->r);
+    }
 
-			return { aux.first, t };
-		}
-	}
+    pair<pnode, pnode> split(pnode t, T key) {
+        if (t == nullptr) {
+            return {nullptr, nullptr};
+        }
 
-	Node* merge(Node *sm, Node *bg) {
-		if(sm == nullptr) {
-			return bg;
-		}
-		if(bg == nullptr) {
-			return sm;
-		}
+        if (t->key <= key) {
+            auto [l, r] = split(t->r, key);
+            t->r = l;
 
-		if(sm->prior > bg->prior) {
-			sm->r = merge(sm->r, bg);
-			pull(sm);
-			return sm;
-		}
-		else {
-			bg->l = merge(sm, bg->l);
-			pull(bg);
-			return bg;
-		}
-	}
+            pull(t);
 
-	void insertVal(T x) {
-		nodes[nxtNode] = Node(x);
+            return {t, r};
+        } else {
+            auto [l, r] = split(t->l, key);
+            t->l = r;
 
-		auto aux1 = split(root, x);
-		aux1.first = merge(aux1.first, &nodes[nxtNode]);
-		root = merge(aux1.first, aux1.second);
+            pull(t);
 
-		nxtNode++;
-	}
+            return {l, t};
+        }
+    }
 
-	void deleteAll(T x) {	
-		auto aux1 = split(root, x);
-		auto aux2 = split(aux1.first, x - 1);
-		root = merge(aux2.first, aux1.second);
-	}
+    pnode merge(pnode sm, pnode bg) {
+        if (sm == nullptr) {
+            return bg;
+        }
+        if (bg == nullptr) {
+            return sm;
+        }
 
-	void deleteSingle(T x) {
-		auto aux1 = split(root, x);
-		auto aux2 = split(aux1.first, x - 1);
+        if (sm->prior > bg->prior) {
+            sm->r = merge(sm->r, bg);
+            pull(sm);
+            return sm;
+        } else {
+            bg->l = merge(sm, bg->l);
+            pull(bg);
+            return bg;
+        }
+    }
 
-		aux2.second = merge(aux2.second->l, aux2.second->r);
-		aux1.first = merge(aux2.first, aux2.second);
-		root = merge(aux1.first, aux1.second);	
-	}
-	
-	Node* findKth(Node *t, int32_t k) {
-		if(t == nullptr) {
-			return nullptr;
-		}
+    pnode find_kth(pnode t, int k) {
+        if (t == nullptr) {
+            return nullptr;
+        }
 
-		if(getSize(t->l) == k - 1) {
-			return t;
-		}
-		else if(getSize(t->l) < k - 1) {
-			return findKth(t->r, k - getSize(t->l) - 1);
-		}
-		else {
-			return findKth(t->l, k);
-		}
-	}
+        if (get_size(t->l) == k - 1) {
+            return t;
+        } else if (get_size(t->l) < k - 1) {
+            return find_kth(t->r, k - get_size(t->l) - 1);
+        } else {
+            return find_kth(t->l, k);
+        }
+    }
 
-	T findKth(int32_t k) {
-		auto aux = findKth(root, k);
+    void print_treap(pnode t) {
+        if (t == nullptr) {
+            return;
+        }
 
-		if(aux == nullptr) {
-			return -1;
-		}
+        print_treap(t->l);
+        cout << t->key << " ";
+        print_treap(t->r);
+    }
 
-		return aux->key;
-	}
-	
-	int32_t findOrder(T x) {
-		auto aux = split(root, x - 1);
-		int32_t ans = getSize(aux.first);
-		root = merge(aux.first, aux.second);
-		return ans;
-	}
-	
-	void printTreap(Node *t) {
-		if(t == nullptr) {
-			return;
-		}
+  public:
+    int get_size() const { return get_size(root); }
 
-		printTreap(t->l);
-		std::cout << t->key << " ";
-		printTreap(t->r);
-	}
+    void insert_val(T x) {
+        nodes[nxtNode] = node(x);
 
-	void print() {
-		printTreap(root);
-		std::cout << '\n';
-	}
+        auto [l, r] = split(root, x);
+        l = merge(l, &nodes[nxtNode]);
+        root = merge(l, r);
+
+        nxtNode++;
+    }
+
+    void delete_all(T x) {
+        auto [l1, r1] = split(root, x);
+        auto [l2, r2] = split(l1, x - 1);
+        root = merge(l2, r1);
+    }
+
+    void delete_single(T x) {
+        auto [l1, r1] = split(root, x);
+        auto [l2, r2] = split(l1, x - 1);
+        r2 = merge(r2->l, r2->r);
+        r1 = merge(l2, r2);
+        root = merge(l1, r1);
+    }
+
+    T find_kth(int k) {
+        auto aux = find_kth(root, k);
+
+        if (aux == nullptr) {
+            return -1;
+        }
+
+        return aux->key;
+    }
+
+    int find_order(T x) {
+        auto aux = split(root, x - 1);
+        int ans = get_size(aux.first);
+        root = merge(aux.first, aux.second);
+        return ans;
+    }
+
+    void print() {
+        print_treap(root);
+        cout << '\n';
+    }
 };
-
