@@ -1,3 +1,9 @@
+#include <cstdint>
+#include <istream>
+#include <ostream>
+
+using namespace std;
+
 template <int MOD> class ModNum {
   private:
     int v;
@@ -22,10 +28,10 @@ template <int MOD> class ModNum {
         if (pw == 0) {
             return ModNum(1);
         } else if (pw % 2 == 0) {
-            ModNum aux = fastPow(x, pw / 2);
+            ModNum aux = fast_pow(x, pw / 2);
             return aux * aux;
         } else {
-            ModNum aux = fastPow(x, pw - 1);
+            ModNum aux = fast_pow(x, pw - 1);
             return aux * x;
         }
     }
