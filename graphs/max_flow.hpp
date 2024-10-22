@@ -1,104 +1,111 @@
-const int32_t INF = 1e9 + 5;
+/* -------------------------- MaxFlow -------------------------- */
+#include <cstdint>
+#include <queue>
+#include <vector>
 
-template<typename T>
-struct MaxFlow {
-	struct Edge {
-		int32_t v;
-		T cap;
+using namespace std;
 
-		Edge() {}
-		Edge(int32_t _v, T _cap) : v(_v), cap(_cap) {}
-	};
+template <typename T> class MaxFlow {
+  public:
+    MaxFlow(int n) : n(n), dep(n), ind(n, 0), g(n) {}
 
-	int32_t n;
-	std::vector<int32_t> dep, ind;
-	std::vector<std::vector<int32_t>> g;
-	std::vector<Edge> edges;
+    void add_edge(int u, int v, T cap) {
+        if (cap == 0)
+            return;
 
-	MaxFlow(int32_t n): n(n), dep(n), ind(n, 0), g(n) {}
+        edges.push_back(edge_t(v, cap));
+        g[u].push_back(edges.size() - 1);
 
-	void addEdge(int32_t u, int32_t v, T cap) {
-		if(cap == 0) return;
+        edges.push_back(edge_t(u, 0));
+        g[v].push_back(edges.size() - 1);
+    }
 
-		edges.push_back(Edge(v, cap));
-		g[u].push_back(edges.size() - 1);
+    T get_max_flow(int source, int sink) {
+        T flow = 0;
+        while (1) {
+            bfs(source, sink);
 
-		edges.push_back(Edge(u, 0));
-		g[v].push_back(edges.size() - 1);
-	}
+            if (dep[source] == -1) {
+                break;
+            }
 
-	void bfs(int32_t source, int32_t sink) {
-		std::queue<int32_t> q;
-		
-		for(int32_t i = 0; i < n; i++) {
-			dep[i] = -1;
-		}
-		dep[sink] = 0;
+            fill(ind.begin(), ind.end(), 0);
+            while (1) {
+                T f = dfs(source, INT64_MAX);
+                if (f == 0) {
+                    break;
+                }
 
-		q.push(sink);
+                flow += f;
+            }
+        }
 
-		while(!q.empty()) {
-			int32_t u = q.front();
-			int32_t d = dep[u];
-			q.pop();
+        return flow;
+    }
 
-			if(u == source) {
-				break;
-			}
+  private:
+    struct edge_t {
+        int v;
+        T cap;
 
-			for(auto e : g[u]) {
-				if(edges[e ^ 1].cap != 0 && dep[edges[e].v] == -1) {
-					q.push(edges[e].v);
-					dep[edges[e].v] = d + 1;
-				}
-			}	
-		}
-	}
+        edge_t() {}
+        edge_t(int _v, T _cap) : v(_v), cap(_cap) {}
+    };
 
-	T dfs(int32_t u, T mf) {
-		if(dep[u] == 0) {
-			return mf;
-		}
+    void bfs(int source, int sink) {
+        queue<int> q;
 
-		for(; ind[u] < g[u].size(); ind[u]++) {
-			int32_t v = edges[g[u][ind[u]]].v;
-			T cap = edges[g[u][ind[u]]].cap;
-			
-			if(dep[v] == dep[u] - 1 && cap != 0) {
-				T aux = dfs(v, std::min(mf, cap));
-				
-				if(aux > 0) {
-					edges[g[u][ind[u]]].cap -= aux;
-					edges[g[u][ind[u]] ^ 1].cap += aux;
-					return aux;
-				}
-			}
-		}
-		
-		return 0;
-	}
+        for (int i = 0; i < n; i++) {
+            dep[i] = -1;
+        }
+        dep[sink] = 0;
 
-	T getMaxFlow(int32_t source, int32_t sink) {
-		T flow = 0;
-		while(1) {
-			bfs(source, sink);
+        q.push(sink);
 
-			if(dep[source] == -1) {
-				break;
-			}
-			
-			std::fill(ind.begin(), ind.end(), 0);
-			while(1) {
-				T f = dfs(source, INF);
-				if(f == 0) {
-					break;
-				}
-				
-				flow += f;
-			}
-		}
+        while (!q.empty()) {
+            int u = q.front();
+            int d = dep[u];
+            q.pop();
 
-		return flow;
-	}
+            if (u == source) {
+                break;
+            }
+
+            for (auto e : g[u]) {
+                if (edges[e ^ 1].cap != 0 && dep[edges[e].v] == -1) {
+                    q.push(edges[e].v);
+                    dep[edges[e].v] = d + 1;
+                }
+            }
+        }
+    }
+
+    T dfs(int u, T mf) {
+        if (dep[u] == 0) {
+            return mf;
+        }
+
+        for (; ind[u] < g[u].size(); ind[u]++) {
+            int v = edges[g[u][ind[u]]].v;
+            T cap = edges[g[u][ind[u]]].cap;
+
+            if (dep[v] == dep[u] - 1 && cap != 0) {
+                T aux = dfs(v, min(mf, cap));
+
+                if (aux > 0) {
+                    edges[g[u][ind[u]]].cap -= aux;
+                    edges[g[u][ind[u]] ^ 1].cap += aux;
+                    return aux;
+                }
+            }
+        }
+
+        return 0;
+    }
+
+    int n;
+    vector<int> dep, ind;
+    vector<vector<int>> g;
+    vector<edge_t> edges;
 };
-
+/* -------------------------- MaxFlow -------------------------- */
