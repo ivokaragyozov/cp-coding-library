@@ -1,5 +1,10 @@
+/* -------------------------- Treap -------------------------- */
+#include <iostream>
+#include <random>
+
+using namespace std;
+
 const int MAX_N = 2e5;
-mt19937 mt(69);
 
 template <typename T> class Treap {
   private:
@@ -24,6 +29,7 @@ template <typename T> class Treap {
     int nxtNode = 0;
     pnode root = nullptr;
     node nodes[MAX_N + 5];
+    static mt19937 mt;
 
     int get_size(pnode t) const { return (t == nullptr ? 0 : t->subsize); }
 
@@ -149,3 +155,6 @@ template <typename T> class Treap {
         cout << '\n';
     }
 };
+
+template <typename T> mt19937 Treap<T>::mt(69);
+/* -------------------------- Treap -------------------------- */
