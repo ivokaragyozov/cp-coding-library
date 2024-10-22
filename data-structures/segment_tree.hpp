@@ -1,3 +1,8 @@
+/* -------------------------- SegmentTree -------------------------- */
+#include <vector>
+
+using namespace std;
+
 template <typename T> class SegmentTree {
   private:
     int treeSize;
@@ -58,3 +63,4 @@ template <typename T> class SegmentTree {
 
     T query(int low, int high) { return query(1, 1, treeSize, low, high); }
 };
+/* -------------------------- SegmentTree -------------------------- */

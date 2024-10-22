@@ -1,10 +1,15 @@
-template <typename T> class FenwickTree {
+/* -------------------------- Fenwick -------------------------- */
+#include <vector>
+
+using namespace std;
+
+template <typename T> class Fenwick {
   private:
     int treeSize;
     vector<T> data;
 
   public:
-    FenwickTree(int _size) : treeSize(_size), data(_size + 1, 0) {}
+    Fenwick(int _size) : treeSize(_size), data(_size + 1, 0) {}
 
     void update(int ind, T val) {
         while (ind <= treeSize) {
@@ -24,3 +29,4 @@ template <typename T> class FenwickTree {
 
     T get_interval(int low, int high) { return get(high) - get(low - 1); }
 };
+/* -------------------------- Fenwick -------------------------- */
