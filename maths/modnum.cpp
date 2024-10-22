@@ -1,3 +1,4 @@
+/* -------------------------- ModNum -------------------------- */
 #include <cstdint>
 #include <istream>
 #include <ostream>
@@ -139,3 +140,4 @@ template <int MOD> class ModNum {
         return ModNum(a) / b;
     }
 };
+/* -------------------------- ModNum -------------------------- */
