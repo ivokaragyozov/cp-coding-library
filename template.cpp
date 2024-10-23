@@ -5,6 +5,7 @@
 
 using namespace std;
 
+#define ll long long
 #define debug(x) cout << #x << " " << (x) << endl;
 #define remax(a, b) a = max((a), (b));
 #define remin(a, b) a = min((a), (b));
