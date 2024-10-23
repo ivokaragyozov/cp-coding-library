@@ -1,3 +1,4 @@
+/* -------------------------- SegmentTree -------------------------- */
 #include <functional>
 #include <vector>
 
@@ -22,7 +23,15 @@ template <class T, auto merge, auto identity> class SegmentTree {
     T query(int l, int r) const { return query(1, 1, n, l, r); }
 
     template <class F> int max_right(int l, F f) const {
+        static_assert(is_convertible_v<decltype(f), function<bool(T)>>,
+                      "f must work as bool(T)");
         return max_right(1, 1, n, l, f);
+    }
+
+    template <class F> int min_left(int r, F f) const {
+        static_assert(is_convertible_v<decltype(f), function<bool(T)>>,
+                      "f must work as bool(T)");
+        return min_left(1, 1, n, r, f);
     }
 
   private:
@@ -75,7 +84,7 @@ template <class T, auto merge, auto identity> class SegmentTree {
             acc = merge(acc, data[node]);
             return -1;
         } else if (l == r) {
-            return l;
+            return r;
         }
 
         int m = (l + r) / 2;
@@ -87,6 +96,28 @@ template <class T, auto merge, auto identity> class SegmentTree {
         return max_right(2 * node + 1, m + 1, r, ql, f, acc);
     }
 
+    template <class F>
+    int min_left(int node, int l, int r, int qr, F f,
+                 T acc = identity()) const {
+        if (l > qr) {
+            return -1;
+        } else if (r <= qr && f(merge(data[node], acc))) {
+            acc = merge(data[node], acc);
+            return -1;
+        } else if (l == r) {
+            return l;
+        }
+
+        int m = (l + r) / 2;
+        int right = min_left(2 * node + 1, m + 1, r, qr, f, acc);
+        if (right != -1) {
+            return right;
+        }
+
+        return min_left(2 * node, l, m, qr, f, acc);
+    }
+
     int n;
     vector<T> data;
 };
+/* -------------------------- SegmentTree -------------------------- */
