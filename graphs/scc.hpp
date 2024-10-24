@@ -1,7 +1,6 @@
 /* -------------------------- SCC -------------------------- */
-#include <set>
-#include <stack>
-#include <vector>
+#pragma once
+#include <bits/stdc++.h>
 
 using namespace std;
 

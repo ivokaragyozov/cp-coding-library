@@ -1,6 +1,6 @@
 /* -------------------------- Hash -------------------------- */
-#include <cstddef>
-#include <vector>
+#pragma once
+#include <bits/stdc++.h>
 
 #include "maths/modnum.hpp"
 
