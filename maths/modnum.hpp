@@ -1,7 +1,6 @@
 /* -------------------------- ModNum -------------------------- */
-#include <cstdint>
-#include <istream>
-#include <ostream>
+#pragma once
+#include <bits/stdc++.h>
 
 using namespace std;
 

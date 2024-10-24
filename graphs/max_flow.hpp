@@ -1,7 +1,6 @@
 /* -------------------------- MaxFlow -------------------------- */
-#include <cstdint>
-#include <queue>
-#include <vector>
+#pragma once
+#include <bits/stdc++.h>
 
 using namespace std;
 

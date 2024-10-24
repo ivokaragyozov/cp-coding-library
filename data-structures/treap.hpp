@@ -1,6 +1,6 @@
 /* -------------------------- Treap -------------------------- */
-#include <iostream>
-#include <random>
+#pragma once
+#include <bits/stdc++.h>
 
 using namespace std;
 

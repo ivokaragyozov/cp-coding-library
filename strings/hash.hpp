@@ -2,7 +2,7 @@
 #include <cstddef>
 #include <vector>
 
-#include "../maths/modnum.hpp"
+#include "maths/modnum.hpp"
 
 using namespace std;
 

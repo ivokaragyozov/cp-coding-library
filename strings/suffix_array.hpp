@@ -1,7 +1,6 @@
 /* -------------------------- SuffixArray -------------------------- */
-#include <string>
-#include <utility>
-#include <vector>
+#pragma once
+#include <bits/stdc++.h>
 
 using namespace std;
 
