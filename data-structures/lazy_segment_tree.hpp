@@ -32,6 +32,18 @@ template <class T, class F> class LazySegmentTree {
 
     T query(int l, int r) { return query(0, 0, n - 1, l, r); }
 
+    template <class G> int max_right(int l, G g) {
+        static_assert(is_convertible_v<decltype(g), function<bool(T)>>,
+                      "g must work as bool(T)");
+        return max_right(0, 0, n - 1, l, g);
+    }
+
+    template <class G> int min_left(int r, G g) {
+        static_assert(is_convertible_v<decltype(g), function<bool(T)>>,
+                      "g must work as bool(T)");
+        return min_left(0, 0, n - 1, r, g);
+    }
+
   private:
     void push(int node, int l, int r) {
         data[node] = F::apply(lazy[node], data[node]);
@@ -111,6 +123,48 @@ template <class T, class F> class LazySegmentTree {
 
         data[node] = T::merge(data[2 * node + 1], data[2 * node + 2]);
         return res;
+    }
+
+    template <class G>
+    int max_right(int node, int l, int r, int ql, G g, T acc = T::id()) {
+        push(node, l, r);
+        if (r < ql) {
+            return -1;
+        } else if (l >= ql && g(T::merge(acc, data[node]))) {
+            acc = T::merge(acc, data[node]);
+            return -1;
+        } else if (l == r) {
+            return r;
+        }
+
+        int m = (l + r) / 2;
+        int left = max_right(2 * node + 1, l, m, ql, g, acc);
+        if (left != -1) {
+            return left;
+        }
+
+        return max_right(2 * node + 2, m + 1, r, ql, g, acc);
+    }
+
+    template <class G>
+    int min_left(int node, int l, int r, int qr, G g, T acc = T::id()) {
+        push(node, l, r);
+        if (l > qr) {
+            return -1;
+        } else if (r <= qr && g(T::merge(data[node], acc))) {
+            acc = T::merge(data[node], acc);
+            return -1;
+        } else if (l == r) {
+            return l;
+        }
+
+        int m = (l + r) / 2;
+        int right = min_left(2 * node + 2, m + 1, r, qr, g, acc);
+        if (right != -1) {
+            return right;
+        }
+
+        return min_left(2 * node + 1, l, m, qr, g, acc);
     }
 
     int n;
