@@ -5,10 +5,6 @@
 using namespace std;
 
 template <typename T> class Fenwick {
-  private:
-    int treeSize;
-    vector<T> data;
-
   public:
     Fenwick(int _size) : treeSize(_size), data(_size + 1, 0) {}
 
@@ -29,5 +25,9 @@ template <typename T> class Fenwick {
     }
 
     T get_interval(int low, int high) { return get(high) - get(low - 1); }
+
+  private:
+    int treeSize;
+    vector<T> data;
 };
 /* -------------------------- Fenwick -------------------------- */
