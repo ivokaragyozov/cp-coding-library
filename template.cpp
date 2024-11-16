@@ -1,11 +1,9 @@
-#include <bits/stdc++.h>
+#include <iostream>
+#include <istream>
+#include <ostream>
+#include <vector>
 
 using namespace std;
-
-#define ll long long
-#define debug(x) cout << #x << " " << (x) << endl;
-#define remax(a, b) a = max((a), (b));
-#define remin(a, b) a = min((a), (b));
 
 template <typename T1, typename T2>
 ostream &operator<<(ostream &out, const pair<T1, T2> &x) {
@@ -30,6 +28,11 @@ template <typename T> ostream &operator<<(ostream &out, const vector<T> &a) {
     }
     return out;
 };
+
+#define ll long long
+#define debug(x) cout << #x << " " << (x) << endl;
+#define remax(a, b) a = max((a), (b));
+#define remin(a, b) a = min((a), (b));
 
 int main() {
     ios_base::sync_with_stdio(false);
