@@ -1,6 +1,6 @@
 /* -------------------------- Fenwick -------------------------- */
 #pragma once
-#include <bits/stdc++.h>
+#include <vector>
 
 using namespace std;
 
@@ -24,7 +24,12 @@ template <typename T> class Fenwick {
         return ans;
     }
 
-    T get_interval(int low, int high) { return get(high) - get(low - 1); }
+    T get_interval(int low, int high) {
+        if (low > high) {
+            return 0;
+        }
+        return get(high) - get(low - 1);
+    }
 
   private:
     int treeSize;

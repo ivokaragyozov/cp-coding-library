@@ -9,13 +9,11 @@ from os import getenv, environ, pathsep
 from pathlib import Path
 from typing import List, Set
 
-
 logger = getLogger(__name__)  # type: Logger
 
 
 class Expander:
-    include_regex = re.compile(
-        r'#include\s"([a-z_-]+\/[a-z_-]+\.hpp)"\s*')
+    include_regex = re.compile(r'#include\s"([a-z_-]+\/[a-z_-]+\.hpp)"\s*')
 
     def is_ignored_line(self, line) -> bool:
         if line.strip() == "#include <bits/stdc++.h>":
@@ -36,15 +34,15 @@ class Expander:
             path = lib_path / lib_name
             if path.exists():
                 return path
-        logger.error('cannot find: {}'.format(lib_name))
+        logger.error("cannot find: {}".format(lib_name))
         raise FileNotFoundError()
 
     def expand_lib(self, lib_file_path: Path) -> List[str]:
         if lib_file_path in self.included:
-            logger.info('already included: {}'.format(lib_file_path.name))
+            logger.info("already included: {}".format(lib_file_path.name))
             return []
         self.included.add(lib_file_path)
-        logger.info('include: {}'.format(lib_file_path.name))
+        logger.info("include: {}".format(lib_file_path.name))
 
         source = open(str(lib_file_path)).read()
 
@@ -70,37 +68,43 @@ class Expander:
             linenum += 1
             m = self.include_regex.match(line)
             if m:
-                acl_path = self.find_lib(m.group(1))
-                result.extend(self.expand_lib(acl_path))
+                lib_path = self.find_lib(m.group(1))
+                result.extend(self.expand_lib(lib_path))
                 if origname:
-                    result.append('#line ' + str(linenum + 1) + ' "' + origname + '"')
+                    result.append("#line " + str(linenum + 1) + ' "' + origname + '"')
                 continue
 
-            result.append(line)
-        return '\n'.join(result)
+            if line.strip() != "using namespace std;":
+                result.append(line)
+
+        result.insert(1, "\nusing namespace std;")
+        return "\n".join(result)
 
 
 if __name__ == "__main__":
     basicConfig(
         format="%(asctime)s [%(levelname)s] %(message)s",
         datefmt="%H:%M:%S",
-        level=getenv('LOG_LEVEL', 'INFO'),
+        level=getenv("LOG_LEVEL", "INFO"),
     )
-    parser = argparse.ArgumentParser(description='Expander')
-    parser.add_argument('source', help='Source File')
-    parser.add_argument('-c', '--console',
-                        action='store_true', help='Print to Console')
-    parser.add_argument('--lib', help='Path to Coding Library')
-    parser.add_argument('--origname', help='report line numbers from the original ' +
-                                           'source file in GCC/Clang error messages')
+    parser = argparse.ArgumentParser(description="Expander")
+    parser.add_argument("source", help="Source File")
+    parser.add_argument("-c", "--console", action="store_true", help="Print to Console")
+    parser.add_argument("--lib", help="Path to Coding Library")
+    parser.add_argument(
+        "--origname",
+        help="report line numbers from the original "
+        + "source file in GCC/Clang error messages",
+    )
     opts = parser.parse_args()
 
     lib_paths = []
     if opts.lib:
         lib_paths.append(Path(opts.lib))
-    if 'CPLUS_INCLUDE_PATH' in environ:
+    if "CPLUS_INCLUDE_PATH" in environ:
         lib_paths.extend(
-            map(Path, filter(None, environ['CPLUS_INCLUDE_PATH'].split(pathsep))))
+            map(Path, filter(None, environ["CPLUS_INCLUDE_PATH"].split(pathsep)))
+        )
     lib_paths.append(Path.cwd())
     expander = Expander(lib_paths)
     source = open(opts.source).read()
@@ -109,5 +113,5 @@ if __name__ == "__main__":
     if opts.console:
         print(output)
     else:
-        with open('combined.cpp', 'w') as f:
+        with open("combined.cpp", "w") as f:
             f.write(output)
