@@ -3,20 +3,22 @@
 
 using namespace std;
 
-template <typename T,
-          typename F,
-          typename Merge        = function<T(const T &, const T &)>,
-          typename Identity     = function<T()>,
-          typename LazyApply    = function<T(const F &, const T &)>,
-          typename LazyMerge    = function<F(const F &, const F &)>,
+template <typename T, typename F, typename Merge = function<T(const T&, const T&)>,
+          typename Identity = function<T()>, typename LazyApply = function<T(const F&, const T&)>,
+          typename LazyMerge = function<F(const F&, const F&)>,
           typename LazyIdentity = function<F()>>
 class LazySegmentTree {
-  public:
-    LazySegmentTree() : LazySegmentTree(0) {}
-    LazySegmentTree(int n, Merge merge, Identity id, LazyApply lazy_apply, LazyMerge lazy_merge, function<F()> lazy_id)
-        : LazySegmentTree(vector<T>(n, id()), merge, id, lazy_apply, lazy_merge, lazy_id) {}
-    LazySegmentTree(
-        const vector<T> &v, Merge merge, Identity id, LazyApply lazy_apply, LazyMerge lazy_merge, LazyIdentity lazy_id)
+public:
+    LazySegmentTree() : LazySegmentTree(0) {
+    }
+
+    LazySegmentTree(int n, Merge merge, Identity id, LazyApply lazy_apply, LazyMerge lazy_merge,
+                    function<F()> lazy_id)
+        : LazySegmentTree(vector<T>(n, id()), merge, id, lazy_apply, lazy_merge, lazy_id) {
+    }
+
+    LazySegmentTree(const vector<T>& v, Merge merge, Identity id, LazyApply lazy_apply,
+                    LazyMerge lazy_merge, LazyIdentity lazy_id)
         : n(static_cast<int>(v.size())),
           data(v),
           lazy(4 * n, lazy_id()),
@@ -44,7 +46,7 @@ class LazySegmentTree {
         return query(0, 0, n - 1, l, r);
     }
 
-  private:
+private:
     void push(int node, int l, int r) {
         data[node] = lazy_apply(lazy[node], data[node]);
 
@@ -56,7 +58,7 @@ class LazySegmentTree {
         lazy[node] = lazy_id();
     }
 
-    void build(int node, int l, int r, const vector<T> &v) {
+    void build(int node, int l, int r, const vector<T>& v) {
         if (l == r) {
             data[node] = v[l];
             return;
@@ -73,7 +75,8 @@ class LazySegmentTree {
         push(node, l, r);
         if (l > i || r < i) {
             return;
-        } else if (l == r) {
+        }
+        else if (l == r) {
             data[node] = x;
             return;
         }
@@ -89,7 +92,8 @@ class LazySegmentTree {
         push(node, l, r);
         if (l > qr || r < ql) {
             return;
-        } else if (l >= ql && r <= qr) {
+        }
+        else if (l >= ql && r <= qr) {
             data[node] = lazy_apply(f, data[node]);
 
             if (l != r) {
@@ -112,23 +116,25 @@ class LazySegmentTree {
 
         if (l > qr || r < ql) {
             return id();
-        } else if (l >= ql && r <= qr) {
+        }
+        else if (l >= ql && r <= qr) {
             return data[node];
         }
 
-        int m      = (l + r) / 2;
-        data[node] = merge(query(2 * node + 1, l, m, ql, qr), query(2 * node + 2, m + 1, r, ql, qr));
+        int m = (l + r) / 2;
+        data[node] =
+            merge(query(2 * node + 1, l, m, ql, qr), query(2 * node + 2, m + 1, r, ql, qr));
 
         return data[node];
     }
 
-    Merge        merge;
-    Identity     id;
-    LazyApply    lazy_apply;
-    LazyMerge    lazy_merge;
+    Merge merge;
+    Identity id;
+    LazyApply lazy_apply;
+    LazyMerge lazy_merge;
     LazyIdentity lazy_id;
 
-    int       n;
+    int n;
     vector<T> data;
     vector<F> lazy;
 };

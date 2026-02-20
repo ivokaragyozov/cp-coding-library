@@ -15,19 +15,21 @@ istream& operator>>(istream& in, pair<T1, T2>& x) {
     return in >> x.first >> x.second;
 }
 
-template <typename T> istream& operator>>(istream& in, vector<T>& a) {
+template <typename T>
+istream& operator>>(istream& in, vector<T>& a) {
     for (auto& x : a) {
         in >> x;
     }
     return in;
-};
+}
 
-template <typename T> ostream& operator<<(ostream& out, const vector<T>& a) {
+template <typename T>
+ostream& operator<<(ostream& out, const vector<T>& a) {
     for (auto x : a) {
         out << x << ' ';
     }
     return out;
-};
+}
 
 #define ll long long
 #define debug(x) cout << #x << " " << (x) << endl;

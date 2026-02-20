@@ -4,13 +4,16 @@
 
 using namespace std;
 
-template <typename T> class MaxFlow {
-  public:
-    MaxFlow(int n) : n(n), dep(n), ind(n, 0), g(n) {}
+template <typename T>
+class MaxFlow {
+public:
+    MaxFlow(int n) : n(n), dep(n), ind(n, 0), g(n) {
+    }
 
     void add_edge(int u, int v, T cap) {
-        if (cap == 0)
+        if (cap == 0) {
             return;
+        }
 
         edges.push_back(edge_t(v, cap));
         g[u].push_back(edges.size() - 1);
@@ -42,13 +45,16 @@ template <typename T> class MaxFlow {
         return flow;
     }
 
-  private:
+private:
     struct edge_t {
         int v;
         T cap;
 
-        edge_t() {}
-        edge_t(int _v, T _cap) : v(_v), cap(_cap) {}
+        edge_t() {
+        }
+
+        edge_t(int _v, T _cap) : v(_v), cap(_cap) {
+        }
     };
 
     void bfs(int source, int sink) {
@@ -107,4 +113,5 @@ template <typename T> class MaxFlow {
     vector<vector<int>> g;
     vector<edge_t> edges;
 };
+
 /* -------------------------- MaxFlow -------------------------- */

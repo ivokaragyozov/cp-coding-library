@@ -6,14 +6,17 @@ using namespace std;
 
 const int MAX_N = 6e5;
 
-template <typename T> struct ImplicitTreap {
+template <typename T>
+struct ImplicitTreap {
     struct Node {
         bool rev;
         int prior, subtree;
         T val, total;
         Node *l, *r, *par;
 
-        Node() {}
+        Node() {
+        }
+
         Node(T _val) : val(_val), total(_val) {
             rev = false;
             prior = mt();
@@ -23,11 +26,11 @@ template <typename T> struct ImplicitTreap {
             r = nullptr;
         }
 
-        static int getSubtree(Node *x) {
+        static int getSubtree(Node* x) {
             return (x != nullptr ? x->subtree : 0);
         }
 
-        static T getVal(Node *x) {
+        static T getVal(Node* x) {
             if (x == nullptr) {
                 return T();
             }
@@ -35,7 +38,7 @@ template <typename T> struct ImplicitTreap {
             return x->val;
         }
 
-        static T getTotal(Node *x) {
+        static T getTotal(Node* x) {
             if (x == nullptr) {
                 return T();
             }
@@ -43,7 +46,7 @@ template <typename T> struct ImplicitTreap {
             return x->total;
         }
 
-        static void push(Node *x) {
+        static void push(Node* x) {
             if (x == nullptr) {
                 return;
             }
@@ -61,7 +64,7 @@ template <typename T> struct ImplicitTreap {
             }
         }
 
-        static void pull(Node *x) {
+        static void pull(Node* x) {
             if (x == nullptr) {
                 return;
             }
@@ -73,7 +76,7 @@ template <typename T> struct ImplicitTreap {
             x->total = getTotal(x->l) + x->val + getTotal(x->r);
         }
 
-        static void updateParent(Node *x) {
+        static void updateParent(Node* x) {
             if (x == nullptr) {
                 return;
             }
@@ -86,9 +89,9 @@ template <typename T> struct ImplicitTreap {
             }
         }
 
-        static std::pair<Node *, Node *> split(Node *t, int key, int add = 0) {
+        static std::pair<Node*, Node*> split(Node* t, int key, int add = 0) {
             if (t == nullptr) {
-                return {nullptr, nullptr};
+                return { nullptr, nullptr };
             }
 
             push(t);
@@ -104,8 +107,9 @@ template <typename T> struct ImplicitTreap {
                 t->r = aux.first;
                 updateParent(t);
                 pull(t);
-                return {t, aux.second};
-            } else {
+                return { t, aux.second };
+            }
+            else {
                 auto aux = split(t->l, key, add);
 
                 if (t->l != nullptr) {
@@ -115,11 +119,11 @@ template <typename T> struct ImplicitTreap {
                 t->l = aux.second;
                 updateParent(t);
                 pull(t);
-                return {aux.first, t};
+                return { aux.first, t };
             }
         }
 
-        static Node *merge(Node *sm, Node *bg) {
+        static Node* merge(Node* sm, Node* bg) {
             push(sm);
             push(bg);
 
@@ -139,7 +143,8 @@ template <typename T> struct ImplicitTreap {
                 updateParent(sm);
                 pull(sm);
                 return sm;
-            } else {
+            }
+            else {
                 if (bg->l != nullptr) {
                     bg->l->par = nullptr;
                 }
@@ -156,28 +161,28 @@ template <typename T> struct ImplicitTreap {
     int nxtNode;
     Node nodes[MAX_N + 5], *root;
 
-    Node *getNode(T val) {
+    Node* getNode(T val) {
         nodes[nxtNode] = Node(val);
         return &nodes[nxtNode++];
     }
 
-    void insertAtInd(int ind, Node *t) {
+    void insertAtInd(int ind, Node* t) {
         auto aux = Node::split(root, ind - 1);
         aux.first = Node::merge(aux.first, t);
         root = Node::merge(aux.first, aux.second);
     }
 
-    std::vector<Node *> splitInterval(int low, int32_t high) {
+    std::vector<Node*> splitInterval(int low, int32_t high) {
         auto aux1 = Node::split(root, low - 1);
         auto aux2 = Node::split(aux1.second, high - low + 1);
 
-        std::vector<Node *> ans = {aux1.first, aux2.first, aux2.second};
+        std::vector<Node*> ans = { aux1.first, aux2.first, aux2.second };
         return ans;
     }
 
-    void mergeIntervals(const std::vector<Node *> &v) {
+    void mergeIntervals(const std::vector<Node*>& v) {
         root = nullptr;
-        for (auto &t : v) {
+        for (auto& t : v) {
             root = Node::merge(root, t);
         }
     }
@@ -190,7 +195,7 @@ template <typename T> struct ImplicitTreap {
         mergeIntervals(aux);
     }
 
-    void printTreap(Node *t) {
+    void printTreap(Node* t) {
         if (t == nullptr) {
             return;
         }
@@ -206,5 +211,6 @@ template <typename T> struct ImplicitTreap {
     }
 };
 
-template <typename T> mt19937 ImplicitTreap<T>::mt(69);
+template <typename T>
+mt19937 ImplicitTreap<T>::mt(69);
 /* -------------------------- ImplicitTreap -------------------------- */

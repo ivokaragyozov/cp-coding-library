@@ -5,13 +5,13 @@
 using namespace std;
 
 class SuffixArray {
-  private:
+private:
     void build_suff_array() {
         int n = t.size();
 
         vector<pair<char, int>> a(n);
         for (int i = 0; i < n; i++) {
-            a[i] = {t[i], i};
+            a[i] = { t[i], i };
         }
         sort(a.begin(), a.end());
 
@@ -20,7 +20,8 @@ class SuffixArray {
         for (int i = 1; i < n; i++) {
             if (a[i].first == a[i - 1].first) {
                 ranks[a[i].second] = ranks[a[i - 1].second];
-            } else {
+            }
+            else {
                 ranks[a[i].second] = ranks[a[i - 1].second] + 1;
             }
         }
@@ -29,7 +30,7 @@ class SuffixArray {
             vector<pair<pair<int, int>, int>> v(n);
 
             for (int i = 0; i < n; i++) {
-                v[i] = {{ranks[i], ranks[(i + (1 << k)) % n]}, i};
+                v[i] = { { ranks[i], ranks[(i + (1 << k)) % n] }, i };
             }
 
             radix_sort(v);
@@ -42,7 +43,8 @@ class SuffixArray {
             for (int i = 1; i < n; i++) {
                 if (v[i].first == v[i - 1].first) {
                     ranks[suffArr[i]] = ranks[suffArr[i - 1]];
-                } else {
+                }
+                else {
                     ranks[suffArr[i]] = ranks[suffArr[i - 1]] + 1;
                 }
             }
@@ -71,11 +73,11 @@ class SuffixArray {
         }
     }
 
-  public:
+public:
     string t;
     vector<int> suffArr, lcpArr;
 
-    SuffixArray(const string &s) {
+    SuffixArray(const string& s) {
         t = s + '$';
 
         suffArr.resize(t.size());
@@ -85,12 +87,12 @@ class SuffixArray {
         build_lcp_array();
     }
 
-    void radix_sort(vector<pair<pair<int, int>, int>> &v) {
+    void radix_sort(vector<pair<pair<int, int>, int>>& v) {
         int n = v.size();
 
         {
             vector<int> cnt(n, 0);
-            for (auto &x : v) {
+            for (auto& x : v) {
                 cnt[x.first.second]++;
             }
 
@@ -100,7 +102,7 @@ class SuffixArray {
             }
 
             vector<pair<pair<int, int>, int>> newV(n);
-            for (auto &x : v) {
+            for (auto& x : v) {
                 newV[ind[x.first.second]] = x;
                 ind[x.first.second]++;
             }
@@ -110,7 +112,7 @@ class SuffixArray {
 
         {
             vector<int> cnt(n, 0);
-            for (auto &x : v) {
+            for (auto& x : v) {
                 cnt[x.first.first]++;
             }
 
@@ -120,7 +122,7 @@ class SuffixArray {
             }
 
             vector<pair<pair<int, int>, int>> newV(n);
-            for (auto &x : v) {
+            for (auto& x : v) {
                 newV[ind[x.first.first]] = x;
                 ind[x.first.first]++;
             }
@@ -129,7 +131,7 @@ class SuffixArray {
         }
     }
 
-    bool contains(const string &p) {
+    bool contains(const string& p) {
         int n = t.size();
         int m = p.size();
 
@@ -143,7 +145,8 @@ class SuffixArray {
                     low = mid + 1;
                     ok = false;
                     break;
-                } else if (t[(suffArr[mid] + i) % n] > p[i]) {
+                }
+                else if (t[(suffArr[mid] + i) % n] > p[i]) {
                     high = mid - 1;
                     ok = false;
                     break;
@@ -158,7 +161,7 @@ class SuffixArray {
         return false;
     }
 
-    int count_occurances(const string &p) {
+    int count_occurances(const string& p) {
         int n = t.size();
         int m = p.size();
 
@@ -174,7 +177,8 @@ class SuffixArray {
                         low = mid + 1;
                         ok = false;
                         break;
-                    } else if (t[(suffArr[mid] + i) % n] > p[i]) {
+                    }
+                    else if (t[(suffArr[mid] + i) % n] > p[i]) {
                         high = mid - 1;
                         ok = false;
                         break;
@@ -200,7 +204,8 @@ class SuffixArray {
                         low = mid + 1;
                         ok = false;
                         break;
-                    } else if (t[(suffArr[mid] + i) % n] > p[i]) {
+                    }
+                    else if (t[(suffArr[mid] + i) % n] > p[i]) {
                         high = mid - 1;
                         ok = false;
                         break;
@@ -229,4 +234,5 @@ class SuffixArray {
         return ans;
     }
 };
+
 /* -------------------------- SuffixArray -------------------------- */

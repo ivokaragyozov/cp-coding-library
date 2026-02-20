@@ -6,17 +6,20 @@ using namespace std;
 
 const int MAX_N = 2e5;
 
-template <typename T> class Treap {
-  private:
+template <typename T>
+class Treap {
+private:
     struct node;
-    using pnode = node *;
+    using pnode = node*;
 
     struct node {
         T key;
         int prior, subsize;
         pnode l, r;
 
-        node() {}
+        node() {
+        }
+
         node(T _key) : key(_key) {
             prior = mt();
             subsize = 1;
@@ -31,7 +34,9 @@ template <typename T> class Treap {
     node nodes[MAX_N + 5];
     static mt19937 mt;
 
-    int get_size(pnode t) const { return (t == nullptr ? 0 : t->subsize); }
+    int get_size(pnode t) const {
+        return (t == nullptr ? 0 : t->subsize);
+    }
 
     void pull(pnode t) {
         if (t == nullptr) {
@@ -43,7 +48,7 @@ template <typename T> class Treap {
 
     pair<pnode, pnode> split(pnode t, T key) {
         if (t == nullptr) {
-            return {nullptr, nullptr};
+            return { nullptr, nullptr };
         }
 
         if (t->key <= key) {
@@ -52,14 +57,15 @@ template <typename T> class Treap {
 
             pull(t);
 
-            return {t, r};
-        } else {
+            return { t, r };
+        }
+        else {
             auto [l, r] = split(t->l, key);
             t->l = r;
 
             pull(t);
 
-            return {l, t};
+            return { l, t };
         }
     }
 
@@ -75,7 +81,8 @@ template <typename T> class Treap {
             sm->r = merge(sm->r, bg);
             pull(sm);
             return sm;
-        } else {
+        }
+        else {
             bg->l = merge(sm, bg->l);
             pull(bg);
             return bg;
@@ -89,9 +96,11 @@ template <typename T> class Treap {
 
         if (get_size(t->l) == k - 1) {
             return t;
-        } else if (get_size(t->l) < k - 1) {
+        }
+        else if (get_size(t->l) < k - 1) {
             return find_kth(t->r, k - get_size(t->l) - 1);
-        } else {
+        }
+        else {
             return find_kth(t->l, k);
         }
     }
@@ -106,8 +115,10 @@ template <typename T> class Treap {
         print_treap(t->r);
     }
 
-  public:
-    int get_size() const { return get_size(root); }
+public:
+    int get_size() const {
+        return get_size(root);
+    }
 
     void insert_val(T x) {
         nodes[nxtNode] = node(x);
@@ -156,5 +167,6 @@ template <typename T> class Treap {
     }
 };
 
-template <typename T> mt19937 Treap<T>::mt(69);
+template <typename T>
+mt19937 Treap<T>::mt(69);
 /* -------------------------- Treap -------------------------- */

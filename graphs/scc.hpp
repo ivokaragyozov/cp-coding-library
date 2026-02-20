@@ -5,21 +5,23 @@
 using namespace std;
 
 class SCC {
-  private:
+private:
     struct vertex_t {
         bool vis;
         int comp;
         vector<int> oute, ine;
 
-        vertex_t() : vis(false), comp(-1) {}
+        vertex_t() : vis(false), comp(-1) {
+        }
     };
 
-    void dfs(int v, stack<int> &st) {
+    void dfs(int v, stack<int>& st) {
         g[v].vis = true;
 
         for (auto u : g[v].oute) {
-            if (!g[u].vis)
+            if (!g[u].vis) {
                 dfs(u, st);
+            }
         }
 
         st.push(v);
@@ -29,12 +31,13 @@ class SCC {
         g[v].comp = comp;
 
         for (auto u : g[v].ine) {
-            if (g[u].comp == -1)
+            if (g[u].comp == -1) {
                 dfs_rev(u, comp);
+            }
         }
     }
 
-  public:
+public:
     vector<vertex_t> g;
     vector<set<int>> dag;
 
@@ -56,8 +59,9 @@ class SCC {
             auto v = st.top();
             st.pop();
 
-            if (g[v].comp == -1)
+            if (g[v].comp == -1) {
                 dfs_rev(v, comp++);
+            }
         }
 
         dag.resize(comp);
@@ -68,4 +72,5 @@ class SCC {
         }
     }
 };
+
 /* -------------------------- SCC -------------------------- */
