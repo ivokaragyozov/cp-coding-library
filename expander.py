@@ -1,117 +1,135 @@
 #!/usr/bin/env python3
-
-# Motivated by AtCoder's https://github.com/atcoder/ac-library/blob/master/expander.py
-
 import re
+import sys
 import argparse
-from logging import Logger, basicConfig, getLogger
-from os import getenv, environ, pathsep
+import subprocess
 from pathlib import Path
 from typing import List, Set
 
-logger = getLogger(__name__)  # type: Logger
+LIBRARY_ROOT = Path(__file__).parent
+
+INCLUDE_RE = re.compile(r'#include\s+"([a-z_/-]+\.hpp)"\s*')
+SYSTEM_INCLUDE_RE = re.compile(r'#include\s+<[^>]+>\s*')
+
+STRIP_FROM_HEADERS = {
+    "#pragma once",
+    "#include <bits/stdc++.h>",
+    "using namespace std;",
+}
 
 
 class Expander:
-    include_regex = re.compile(r'#include\s"([a-z_-]+\/[a-z_-]+\.hpp)"\s*')
+    def __init__(self):
+        self.included: Set[Path] = set()
+        self.system_includes: dict[str, None] = {}  # ordered set via dict
 
-    def is_ignored_line(self, line) -> bool:
-        if line.strip() == "#include <bits/stdc++.h>":
-            return True
-        if line.strip() == "using namespace std;":
-            return True
-        if line.strip() == "#pragma once":
-            return True
-        return False
+    def _find_header(self, include_path: str) -> Path:
+        path = LIBRARY_ROOT / include_path
+        if not path.exists():
+            print(f"error: cannot find '{include_path}'", file=sys.stderr)
+            sys.exit(1)
+        return path
 
-    def __init__(self, lib_paths: List[Path]):
-        self.lib_paths = lib_paths
-
-    included = set()  # type: Set[Path]
-
-    def find_lib(self, lib_name: str) -> Path:
-        for lib_path in self.lib_paths:
-            path = lib_path / lib_name
-            if path.exists():
-                return path
-        logger.error("cannot find: {}".format(lib_name))
-        raise FileNotFoundError()
-
-    def expand_lib(self, lib_file_path: Path) -> List[str]:
-        if lib_file_path in self.included:
-            logger.info("already included: {}".format(lib_file_path.name))
+    def _expand_header(self, path: Path) -> List[str]:
+        if path in self.included:
             return []
-        self.included.add(lib_file_path)
-        logger.info("include: {}".format(lib_file_path.name))
+        self.included.add(path)
 
-        source = open(str(lib_file_path)).read()
-
-        result = []  # type: List[str]
-        for line in source.splitlines():
-            if self.is_ignored_line(line):
+        lines = []
+        for line in path.read_text().splitlines():
+            if line.strip() in STRIP_FROM_HEADERS:
                 continue
-
-            m = self.include_regex.match(line)
+            if SYSTEM_INCLUDE_RE.match(line):
+                self.system_includes[line.strip()] = None
+                continue
+            m = INCLUDE_RE.match(line)
             if m:
-                name = m.group(1)
-                result.extend(self.expand_lib(self.find_lib(name)))
-                continue
+                lines.extend(self._expand_header(self._find_header(m.group(1))))
+            else:
+                lines.append(line)
+        return lines
 
-            result.append(line)
-        return result
-
-    def expand(self, source: str, origname) -> str:
+    def expand(self, source: str) -> str:
         self.included = set()
-        result = []  # type: List[str]
-        linenum = 0
+        self.system_includes = {}
+        body = []
         for line in source.splitlines():
-            linenum += 1
-            m = self.include_regex.match(line)
-            if m:
-                lib_path = self.find_lib(m.group(1))
-                result.extend(self.expand_lib(lib_path))
-                if origname:
-                    result.append("#line " + str(linenum + 1) + ' "' + origname + '"')
+            if SYSTEM_INCLUDE_RE.match(line):
+                self.system_includes[line.strip()] = None
                 continue
+            m = INCLUDE_RE.match(line)
+            if m:
+                body.extend(self._expand_header(self._find_header(m.group(1))))
+            else:
+                body.append(line)
 
-            if line.strip() != "using namespace std;":
-                result.append(line)
+        # Strip leading/trailing blank lines from body so the separator is exactly one blank line.
+        while body and body[0].strip() == "":
+            body.pop(0)
+        while body and body[-1].strip() == "":
+            body.pop()
 
-        result.insert(1, "\nusing namespace std;")
-        return "\n".join(result)
+        sorted_includes = sorted(self.system_includes)
+        return "\n".join(sorted_includes + [""] + body)
+
+
+def copy_to_clipboard(text: str) -> None:
+    try:
+        if sys.platform == "darwin":
+            subprocess.run(["pbcopy"], input=text.encode(), check=True)
+        elif sys.platform == "win32":
+            subprocess.run(["clip"], input=text.encode("utf-16"), check=True)
+        else:
+            for cmd in [
+                ["xclip", "-selection", "clipboard"],
+                ["xsel", "--clipboard", "--input"],
+            ]:
+                try:
+                    subprocess.run(cmd, input=text.encode(), check=True)
+                    return
+                except FileNotFoundError:
+                    continue
+            print(
+                "error: no clipboard tool found (install xclip or xsel)",
+                file=sys.stderr,
+            )
+            sys.exit(1)
+    except subprocess.CalledProcessError as e:
+        print(f"error: clipboard command failed: {e}", file=sys.stderr)
+        sys.exit(1)
 
 
 if __name__ == "__main__":
-    basicConfig(
-        format="%(asctime)s [%(levelname)s] %(message)s",
-        datefmt="%H:%M:%S",
-        level=getenv("LOG_LEVEL", "INFO"),
+    parser = argparse.ArgumentParser(
+        description="Expand coding library #includes inline into a single file."
     )
-    parser = argparse.ArgumentParser(description="Expander")
-    parser.add_argument("source", help="Source File")
-    parser.add_argument("-c", "--console", action="store_true", help="Print to Console")
-    parser.add_argument("--lib", help="Path to Coding Library")
-    parser.add_argument(
-        "--origname",
-        help="report line numbers from the original "
-        + "source file in GCC/Clang error messages",
+    parser.add_argument("source", help="Source .cpp file to expand")
+    group = parser.add_mutually_exclusive_group(required=True)
+    group.add_argument(
+        "-c",
+        "--clipboard",
+        action="store_true",
+        help="Copy expanded result to clipboard",
+    )
+    group.add_argument(
+        "-i",
+        "--inplace",
+        action="store_true",
+        help="Overwrite the source file with expanded result",
     )
     opts = parser.parse_args()
 
-    lib_paths = []
-    if opts.lib:
-        lib_paths.append(Path(opts.lib))
-    if "CPLUS_INCLUDE_PATH" in environ:
-        lib_paths.extend(
-            map(Path, filter(None, environ["CPLUS_INCLUDE_PATH"].split(pathsep)))
-        )
-    lib_paths.append(Path.cwd())
-    expander = Expander(lib_paths)
-    source = open(opts.source).read()
-    output = expander.expand(source, opts.origname)
+    source_path = Path(opts.source)
+    if not source_path.exists():
+        print(f"error: file not found: {opts.source}", file=sys.stderr)
+        sys.exit(1)
 
-    if opts.console:
-        print(output)
+    expander = Expander()
+    output = expander.expand(source_path.read_text())
+
+    if opts.clipboard:
+        copy_to_clipboard(output)
+        print("Copied to clipboard.")
     else:
-        with open("combined.cpp", "w") as f:
-            f.write(output)
+        source_path.write_text(output)
+        print(f"Written to {source_path}.")
