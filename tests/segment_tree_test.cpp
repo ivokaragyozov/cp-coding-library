@@ -3,6 +3,9 @@
 
 #include "data_structures/segment_tree.hpp"
 
+using SumSegTree =
+    SegmentTree<int64_t, [](auto a, auto b) { return a + b; }, []() -> int64_t { return 0; }>;
+
 int main() {
     std::ios::sync_with_stdio(false);
     std::cin.tie(nullptr);
@@ -15,7 +18,7 @@ int main() {
         std::cin >> x;
     }
 
-    SegmentTree<int64_t, [](auto a, auto b) { return a + b; }, []() { return 0; }> segTree(a);
+    SumSegTree segTree = SumSegTree(a);
     while (q--) {
         int type;
         std::cin >> type;
@@ -32,10 +35,5 @@ int main() {
 
             std::cout << segTree.query(l, r - 1) << std::endl;
         }
-
-        for (int i = 0; i < n; i++) {
-            std::cout << segTree.query(i, i) << " ";
-        }
-        std::cout << std::endl;
     }
 }
