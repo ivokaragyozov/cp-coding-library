@@ -1,197 +1,175 @@
+#pragma once
+
 #include <istream>
 #include <ostream>
 
-using namespace std;
-
-using ll = long long;
-
 template <int MOD>
 class ModNum {
+    static_assert(MOD > 1, "MOD must be greater than 1");
+
 private:
     int v;
 
 public:
-    constexpr ModNum() : v(0) {
+    constexpr ModNum();
+    constexpr ModNum(long long value);
+
+    static constexpr int GetMod();
+
+    constexpr explicit operator int() const;
+    constexpr explicit operator long long() const;
+
+    [[nodiscard]] constexpr ModNum GetInv() const;
+
+    [[nodiscard]] constexpr ModNum operator-() const;
+
+    constexpr ModNum& operator++();
+    constexpr ModNum operator++(int);
+    constexpr ModNum& operator--();
+    constexpr ModNum operator--(int);
+
+    constexpr ModNum& operator+=(const ModNum& o);
+    constexpr ModNum& operator-=(const ModNum& o);
+    constexpr ModNum& operator*=(const ModNum& o);
+    constexpr ModNum& operator/=(const ModNum& o);
+
+    // Hidden friends: kept inline so that implicit int/long long -> ModNum
+    // conversions work on both operands (e.g. 4 + Mod(3)). They only forward to
+    // the out-of-line member implementations.
+    friend std::ostream& operator<<(std::ostream& o, const ModNum& x) {
+        return o << x.v;
     }
 
-    constexpr ModNum(int _v) : v((_v % MOD + MOD) % MOD) {
-    }
-
-    constexpr ModNum(ll _v) : v((_v % MOD + MOD) % MOD) {
-    }
-
-    operator int() const {
-        return v;
-    }
-
-    friend ostream& operator<<(ostream& o, const ModNum& x) {
-        return o << (int)x;
-    }
-
-    friend istream& operator>>(istream& i, ModNum& x) {
-        ll val;
+    friend std::istream& operator>>(std::istream& i, ModNum& x) {
+        long long val;
         i >> val;
-
         x = ModNum(val);
         return i;
     }
 
-    template <typename U>
-    friend ModNum fast_pow(const ModNum& x, U pw) {
-        if (pw == 0) {
-            return ModNum(1);
-        }
-        else if (pw % 2 == 0) {
-            ModNum aux = fast_pow(x, pw / 2);
-            return aux * aux;
-        }
-        else {
-            ModNum aux = fast_pow(x, pw - 1);
-            return aux * x;
-        }
+    [[nodiscard]] friend constexpr bool operator==(const ModNum& a, const ModNum& b) {
+        return a.v == b.v;
     }
 
-    ModNum inv() const {
-        return fast_pow(*this, MOD - 2);
+    [[nodiscard]] friend constexpr bool operator!=(const ModNum& a, const ModNum& b) {
+        return a.v != b.v;
     }
 
-    ModNum& operator++() {
-        v++;
-        if (v == MOD) {
-            v = 0;
-        }
-        return *this;
+    [[nodiscard]] friend constexpr ModNum operator+(ModNum a, const ModNum& b) {
+        return a += b;
     }
 
-    ModNum operator++(int) {
-        ModNum aux(*this);
-        (*this)++;
-        return aux;
+    [[nodiscard]] friend constexpr ModNum operator-(ModNum a, const ModNum& b) {
+        return a -= b;
     }
 
-    ModNum& operator--() {
-        v--;
-        if (v == -1) {
-            v = MOD - 1;
-        }
-        return *this;
+    [[nodiscard]] friend constexpr ModNum operator*(ModNum a, const ModNum& b) {
+        return a *= b;
     }
 
-    ModNum& operator--(int) {
-        ModNum aux(*this);
-        (*this)--;
-        return aux;
-    }
-
-    ModNum& operator+=(const ModNum& o) {
-        v += o.v;
-
-        if (v >= MOD) {
-            v -= MOD;
-        }
-
-        return *this;
-    }
-
-    ModNum& operator-=(const ModNum& o) {
-        v -= o.v;
-
-        if (v < 0) {
-            v += MOD;
-        }
-        else if (v >= MOD) {
-            v -= MOD;
-        }
-
-        return *this;
-    }
-
-    ModNum& operator*=(const ModNum& o) {
-        v = ((ll)v * o.v) % MOD;
-        return *this;
-    }
-
-    ModNum& operator/=(const ModNum& o) {
-        return *this *= o.inv();
-    }
-
-    friend ModNum operator+(const ModNum& a, const ModNum& b) {
-        return ModNum(a) += b;
-    }
-
-    friend ModNum operator-(const ModNum& a, const ModNum& b) {
-        return ModNum(a) -= b;
-    }
-
-    friend ModNum operator*(const ModNum& a, const ModNum& b) {
-        return ModNum(a) *= b;
-    }
-
-    friend ModNum operator/(const ModNum& a, const ModNum& b) {
-        return ModNum(a) /= b;
-    }
-
-    friend ModNum operator+(const ModNum& a, int b) {
-        return a + ModNum(b);
-    }
-
-    friend ModNum operator-(const ModNum& a, int b) {
-        return a - ModNum(b);
-    }
-
-    friend ModNum operator*(const ModNum& a, int b) {
-        return a * ModNum(b);
-    }
-
-    friend ModNum operator/(const ModNum& a, int b) {
-        return a / ModNum(b);
-    }
-
-    friend ModNum operator+(int a, const ModNum& b) {
-        return ModNum(a) + b;
-    }
-
-    friend ModNum operator-(int a, const ModNum& b) {
-        return ModNum(a) - b;
-    }
-
-    friend ModNum operator*(int a, const ModNum& b) {
-        return ModNum(a) * b;
-    }
-
-    friend ModNum operator/(int a, const ModNum& b) {
-        return ModNum(a) / b;
-    }
-
-    friend ModNum operator+(const ModNum& a, ll b) {
-        return a + ModNum(b);
-    }
-
-    friend ModNum operator-(const ModNum& a, ll b) {
-        return a - ModNum(b);
-    }
-
-    friend ModNum operator*(const ModNum& a, ll b) {
-        return a * ModNum(b);
-    }
-
-    friend ModNum operator/(const ModNum& a, ll b) {
-        return a / ModNum(b);
-    }
-
-    friend ModNum operator+(ll a, const ModNum& b) {
-        return ModNum(a) + b;
-    }
-
-    friend ModNum operator-(ll a, const ModNum& b) {
-        return ModNum(a) - b;
-    }
-
-    friend ModNum operator*(ll a, const ModNum& b) {
-        return ModNum(a) * b;
-    }
-
-    friend ModNum operator/(ll a, const ModNum& b) {
-        return ModNum(a) / b;
+    [[nodiscard]] friend constexpr ModNum operator/(ModNum a, const ModNum& b) {
+        return a /= b;
     }
 };
+
+template <int MOD, typename U>
+[[nodiscard]] constexpr ModNum<MOD> ComputePower(ModNum<MOD> x, U pw) {
+    ModNum<MOD> result(1);
+    for (; pw > 0; pw >>= 1) {
+        if (pw & 1) {
+            result *= x;
+        }
+        x *= x;
+    }
+    return result;
+}
+
+template <int MOD>
+constexpr ModNum<MOD>::ModNum() : v(0) {
+}
+
+template <int MOD>
+constexpr ModNum<MOD>::ModNum(long long value) : v(static_cast<int>((value % MOD + MOD) % MOD)) {
+}
+
+template <int MOD>
+constexpr int ModNum<MOD>::GetMod() {
+    return MOD;
+}
+
+template <int MOD>
+constexpr ModNum<MOD>::operator int() const {
+    return v;
+}
+
+template <int MOD>
+constexpr ModNum<MOD>::operator long long() const {
+    return v;
+}
+
+template <int MOD>
+constexpr ModNum<MOD> ModNum<MOD>::GetInv() const {
+    return ComputePower(*this, MOD - 2);
+}
+
+template <int MOD>
+constexpr ModNum<MOD> ModNum<MOD>::operator-() const {
+    return v ? ModNum(MOD - v) : ModNum(0);
+}
+
+template <int MOD>
+constexpr ModNum<MOD>& ModNum<MOD>::operator++() {
+    if (++v == MOD) {
+        v = 0;
+    }
+    return *this;
+}
+
+template <int MOD>
+constexpr ModNum<MOD> ModNum<MOD>::operator++(int) {
+    ModNum aux(*this);
+    ++(*this);
+    return aux;
+}
+
+template <int MOD>
+constexpr ModNum<MOD>& ModNum<MOD>::operator--() {
+    if (--v < 0) {
+        v = MOD - 1;
+    }
+    return *this;
+}
+
+template <int MOD>
+constexpr ModNum<MOD> ModNum<MOD>::operator--(int) {
+    ModNum aux(*this);
+    --(*this);
+    return aux;
+}
+
+template <int MOD>
+constexpr ModNum<MOD>& ModNum<MOD>::operator+=(const ModNum& o) {
+    if ((v += o.v) >= MOD) {
+        v -= MOD;
+    }
+    return *this;
+}
+
+template <int MOD>
+constexpr ModNum<MOD>& ModNum<MOD>::operator-=(const ModNum& o) {
+    if ((v -= o.v) < 0) {
+        v += MOD;
+    }
+    return *this;
+}
+
+template <int MOD>
+constexpr ModNum<MOD>& ModNum<MOD>::operator*=(const ModNum& o) {
+    v = static_cast<int>(static_cast<long long>(v) * o.v % MOD);
+    return *this;
+}
+
+template <int MOD>
+constexpr ModNum<MOD>& ModNum<MOD>::operator/=(const ModNum& o) {
+    return *this *= o.GetInv();
+}
