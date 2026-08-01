@@ -1,6 +1,10 @@
 #include <iostream>
 #include <istream>
+#include <map>
 #include <ostream>
+#include <set>
+#include <unordered_map>
+#include <unordered_set>
 #include <vector>
 
 using namespace std;
@@ -27,6 +31,38 @@ template <typename T>
 ostream& operator<<(ostream& out, const vector<T>& a) {
     for (auto x : a) {
         out << x << ' ';
+    }
+    return out;
+}
+
+template <typename T>
+ostream& operator<<(ostream& out, const set<T>& s) {
+    for (const auto& x : s) {
+        out << x << ' ';
+    }
+    return out;
+}
+
+template <typename T>
+ostream& operator<<(ostream& out, const unordered_set<T>& s) {
+    for (const auto& x : s) {
+        out << x << ' ';
+    }
+    return out;
+}
+
+template <typename K, typename V>
+ostream& operator<<(ostream& out, const map<K, V>& m) {
+    for (const auto& [k, v] : m) {
+        out << k << "->" << v << ' ';
+    }
+    return out;
+}
+
+template <typename K, typename V>
+ostream& operator<<(ostream& out, const unordered_map<K, V>& m) {
+    for (const auto& [k, v] : m) {
+        out << k << "->" << v << ' ';
     }
     return out;
 }
