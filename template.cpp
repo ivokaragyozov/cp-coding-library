@@ -32,9 +32,13 @@ ostream& operator<<(ostream& out, const vector<T>& a) {
 }
 
 #define ll long long
-#define debug(x) cout << #x << " " << (x) << endl;
-#define remax(a, b) a = max((a), (b));
-#define remin(a, b) a = min((a), (b));
+#define debug(...)                                                                                 \
+    cerr << "[" << #__VA_ARGS__ << "]:", [&](auto&&... args) {                                     \
+        ((cerr << ' ' << args), ...);                                                              \
+        cerr << endl;                                                                              \
+    }(__VA_ARGS__)
+#define remax(a, ...) a = max({ a, __VA_ARGS__ });
+#define remin(a, ...) a = min({ a, __VA_ARGS__ });
 
 int main() {
     ios_base::sync_with_stdio(false);
